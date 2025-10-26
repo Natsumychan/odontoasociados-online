@@ -1,16 +1,36 @@
-# React + Vite
+# 🦷 OdontoAsociados Online
+**Aplicación web para la gestión odontológica**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 📘 Descripción general
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**OdontoAsociados Online** es una aplicación web desarrollada con **React**, diseñada para facilitar la gestión de servicios odontológicos.
+Permite que pacientes y personal médico puedan:
 
-## React Compiler
+- Iniciar sesión y acceder a paneles personalizados.
+- Visualizar, programar y modificar citas.
+- Consultar historial clínico y facturación.
+- Acceder a información general del consultorio.
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+La arquitectura está basada en componentes reutilizables, con rutas protegidas y un control de autenticación simulado para entornos de desarrollo.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🧩 Tecnologías empleadas
+
+| Categoría | Herramienta / Tecnología | Propósito |
+|------------|--------------------------|------------|
+| **Lenguaje principal** | JavaScript (ES6+) | Desarrollo de componentes y lógica de la aplicación. |
+| **Framework base** | React (con Vite) | Creación de interfaz y componentes modulares. |
+| **Gestión de estado** | React Context API | Manejo global de autenticación y sesión. |
+| **Ruteo** | React Router DOM | Navegación entre vistas públicas y privadas. |
+| **Estilos** | Tailwind CSS | Diseño responsive y moderno. |
+| **Iconografía** | Lucide React | Librería de íconos SVG para React. |
+| **Recursos** | SVG / PNG | Logotipos e imágenes. |
+| **Control de versiones local** | Git | Control de cambios del proyecto. |
+| **Repositorio remoto** | GitHub | Almacenamiento y colaboración del código fuente. |
+| **IDE de desarrollo** | Visual Studio Code | Entorno de desarrollo y depuración. |
+| **Gestor de dependencias** | npm | Instalación y gestión de librerías. |
+
+---
