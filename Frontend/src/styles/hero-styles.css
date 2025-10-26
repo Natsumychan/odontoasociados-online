@@ -1,0 +1,18 @@
+.hero-background {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 12px;
+	background-image: linear-gradient(
+			rgba(60, 91, 228, 0.493),
+			rgba(48, 81, 230, 0.363)
+		),
+		url("../assets/backgorunds/hero-background.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	padding-left: 40px;
+	height: 60vh;
+	width: 100%;
+	color: whitesmoke;
+}

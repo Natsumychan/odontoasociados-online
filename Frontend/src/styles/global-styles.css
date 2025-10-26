@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* === Estilos base personalizados === */
+@theme {
+	--font-display: "Arimo", "sans-serif";
+}
+
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+		height: 100%;
+	}
+
+	body {
+		font-family: var(--font-display);
+		color: var(text-gray-800);
+		line-height: 1.5;
+	}
+
+	img,
+	video {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	/* a {
+		@apply text-blue-600 hover:text-blue-800 no-underline;
+	} */
+
+	button {
+		font: inherit;
+		cursor: pointer;
+	}
+
+	input[type="number"]::-webkit-inner-spin-button,
+	input[type="number"]::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+}
