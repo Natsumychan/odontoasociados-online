@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+
   // 🔹 Al iniciar sesión
   const login = (email, password, role) => {
     setLoading(true);

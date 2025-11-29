@@ -60,7 +60,7 @@ const Register = () => {
   };
 
   // ✅ Manejo del envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
 
@@ -84,8 +84,48 @@ const Register = () => {
       eps: form.eps,
     };
 
-    // Simular guardado en localStorage o API
-    localStorage.setItem("odonto_user", JSON.stringify(newUser));
+    console.log(newUser)
+
+    // Separar nombre completo en nombre y apellido
+  const [nombre, ...resto] = form.nombreCompleto.split(" ");
+  const apellido = resto.join(" ") || "";
+
+  // Construir el JSON que espera el backend
+  const userData = {
+    nombre: nombre,
+    apellido: apellido,
+    email: form.correo,
+    documento: form.cedula,
+    telefono: form.celular,
+    password: form.contrasena,
+    rol: "paciente"
+  };
+
+
+  try {
+    const response = await fetch("http://localhost:8080/api/usuarios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      alert("Error registrando usuario");
+      return;
+    }
+
+    const usuarioCreado = await response.json();
+
+    // Autologin (fake login por ahora)
+    login(usuarioCreado);
+
+    alert("Registro exitoso");
+    navigate("/panelUsuario");
+
+  } catch (error) {
+    console.error("Error:", error);
+    alert("No se pudo conectar con el servidor");
+  }
 
     // ✅ Autenticación automática
     login(newUser);

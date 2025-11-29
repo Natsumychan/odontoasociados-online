@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { loginRequest } from "../services/authService";
 import { Eye, EyeClosed } from 'lucide-react';
 import googleLogo from "../assets/logo/google.svg";
 import facebookLogo from "../assets/logo/facebook.svg";
@@ -12,24 +13,35 @@ const LoginSection = () => {
   const [error, setError] = useState("");
   const [loginSuccess, setLoginSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const { login } = useAuth();
+  const { login, getInfo, userInfo, setUserInfo } = useAuth();
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoginSuccess("");
 
-    const success = login(email, password, tab);
+    const result = await loginRequest(email, password, tab);
 
-    if (success) {
-      setLoginSuccess("Credenciales aceptadas. ¡Bienvenido! ");
+    if (!result.success) {
+      setError(result.message);
+      return;
+    }
+
+    // Guardar usuario en AuthContext
+    login(result.user.email, password, tab);
+    console.log(result)
+
+    setLoginSuccess("Ingreso exitoso. ¡Bienvenido!");
+    // Redirigir según tab
+    if (tab === "paciente") {
+      navigate("/panelUsuario");
     } else {
-      setError("Credenciales incorrectas. Intente de nuevo.");
+      navigate("/panelMedico");
     }
   };
 

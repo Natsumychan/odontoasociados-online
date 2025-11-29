@@ -10,8 +10,10 @@ import {
   Info,
 } from "lucide-react";
 import toothIcon from "../assets/logo/tooth-normal.svg"
+import { useAuth } from "../context/AuthContext";
 
 const UserPanel = () => {
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen text-gray-900">
       {/* Header */}
