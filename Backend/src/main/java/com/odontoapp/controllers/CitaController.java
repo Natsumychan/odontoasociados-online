@@ -19,6 +19,7 @@ public class CitaController {
 
     @PostMapping
     public ResponseEntity<CitaDTO> crear(@RequestBody CreateCitaRequest req) {
+
         CitaDTO created = citaService.crearCita(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
