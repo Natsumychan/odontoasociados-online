@@ -9,4 +9,5 @@ public class PacienteDTO {
     private String grupoSanguineo;
     private String alergias;
     private String enfermedadesPrevias;
+    private String EPS;
 }

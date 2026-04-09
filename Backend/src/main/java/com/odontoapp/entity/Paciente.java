@@ -25,4 +25,9 @@ public class Paciente {
 
     @Column(name = "enfermedades_previas", columnDefinition = "TEXT")
     private String enfermedadesPrevias;
+
+    @Column(name = "EPS")
+    private String EPS;
+
+
 }
