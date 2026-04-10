@@ -8,6 +8,6 @@ public class PacienteDTO {
     private UsuarioDTO usuario;
     private String grupoSanguineo;
     private String alergias;
-    private String enfermedadesPrevias;
+    private String medicamentoAlergias;
     private String EPS;
 }

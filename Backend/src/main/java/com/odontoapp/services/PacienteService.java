@@ -54,7 +54,8 @@ public class PacienteService {
                 .usuario(savedUser)
                 .grupoSanguineo(pacienteDto.getGrupoSanguineo())
                 .alergias(pacienteDto.getAlergias())
-                .enfermedadesPrevias(pacienteDto.getEnfermedadesPrevias())
+                .medicamentoAlergias(pacienteDto.getMedicamentoAlergias())
+                .EPS(pacienteDto.getEPS())
                 .build();
 
         // cuando salve paciente, MapsId hará que id_usuario se ponga igual al id del usuario
