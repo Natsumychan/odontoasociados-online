@@ -12,7 +12,8 @@ const Register = () => {
 	const { login } = useAuth();
 
 	const [form, setForm] = useState({
-		nombreCompleto: "",
+		nombres: "",
+		apellidos: "",
 		cedula: "",
 		fechaNacimiento: "",
 		celular: "",
@@ -20,7 +21,7 @@ const Register = () => {
 		contrasena: "",
 		confirmarContrasena: "",
 		gruposanguineo: "",
-		alergias: "Ninguna",
+		alergias: "",
 		medicamentoAlergias: "",
 		eps: "",
 	});
@@ -40,16 +41,16 @@ const Register = () => {
 	const validateForm = () => {
 		const newErrors = {};
 
-		if (!isRequired(form.nombreCompleto))
-			newErrors.nombreCompleto = "El nombre completo es obligatorio.";
+		if (!isRequired(form.nombres))
+  newErrors.nombres = "Los nombres son obligatorios.";
+		if (!isRequired(form.apellidos))
+  newErrors.apellidos = "Los apellidos son obligatorios.";
 		if (!isRequired(form.cedula))
 			newErrors.cedula = "La cédula es obligatoria.";
 		if (!isRequired(form.fechaNacimiento))
 			newErrors.fechaNacimiento = "Debe ingresar su fecha de nacimiento.";
 		if (!isValidPhone(form.celular))
 			newErrors.celular = "Ingrese un número de celular válido.";
-		if (!isValidEmail(form.correo))
-			newErrors.correo = "Ingrese un correo electrónico válido.";
 		if (!isRequired(form.contrasena))
 			newErrors.contrasena = "La contraseña es obligatoria.";
 		if (form.contrasena !== form.confirmarContrasena)
@@ -65,7 +66,7 @@ const Register = () => {
 	// Submit
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
+		console.log("enviando datos...");
 		const validationErrors = validateForm();
 		if (Object.keys(validationErrors).length > 0) {
 			setErrors(validationErrors);
@@ -73,16 +74,13 @@ const Register = () => {
 		}
 
 		setErrors({});
-
-		// Separar nombre y apellido
-		const [nombre, ...resto] = form.nombreCompleto.trim().split(" ");
-		const apellido = resto.join(" ") || "";
+		const alergia = form.alergias ? "tiene alergias" : "ningua";
 
 		// 🔥 JSON correcto para el backend
 		const requestData = {
 			usuario: {
-				nombre: nombre,
-				apellido: apellido,
+				nombre: form.nombres,
+				apellido: form.apellidos,
 				email: form.correo,
 				documento: form.cedula,
 				telefono: form.celular,
@@ -92,7 +90,7 @@ const Register = () => {
 			paciente: {
 				fechaNacimiento: form.fechaNacimiento,
 				grupoSanguineo: form.gruposanguineo,
-				alergias: form.alergias ? "tiene alergias" : "",
+				alergias: alergia,
 				medicamentoAlergias: form.medicamentoAlergias,
 				eps: form.eps,
 			},
@@ -115,7 +113,7 @@ const Register = () => {
 			}
 
 			const usuarioCreado = await response.json();
-
+			console.log("datos enviados")
 			// ✅ Login solo UNA vez
 			login(usuarioCreado);
 
@@ -137,13 +135,25 @@ const Register = () => {
 				<form
 					onSubmit={handleSubmit}
 					className='space-y-4'>
-					{/* Nombre */}
+					{/* Nombres */}
 					<div>
-						<label className='block font-medium'>Nombre completo *</label>
+						<label className='block font-medium'>Nombres *</label>
 						<input
 							type='text'
-							name='nombreCompleto'
-							value={form.nombreCompleto}
+							name='nombres'
+							value={form.nombres}
+							onChange={handleChange}
+							className='w-full border p-2 rounded'
+						/>
+					</div>
+
+					{/* Apellidos */}
+					<div>
+						<label className='block font-medium'>Apellidos *</label>
+						<input
+							type='text'
+							name='apellidos'
+							value={form.apellidos}
 							onChange={handleChange}
 							className='w-full border p-2 rounded'
 						/>
@@ -175,7 +185,7 @@ const Register = () => {
 
 					{/* Celular */}
 					<div>
-						<label className='block font-medium'>Celular</label>
+						<label className='block font-medium'>Celular *</label>
 						<input
 							type='tel'
 							name='celular'
@@ -187,7 +197,7 @@ const Register = () => {
 
 					{/* Correo */}
 					<div>
-						<label className='block font-medium'>Correo *</label>
+						<label className='block font-medium'>Correo </label>
 						<input
 							type='email'
 							name='correo'

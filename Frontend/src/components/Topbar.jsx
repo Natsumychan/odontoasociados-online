@@ -18,7 +18,7 @@ const Topbar = ({ onMenuClick }) => {
 				{user && (
 					<span className='text-md'>
 						{user.role === "paciente" ? "👤 Paciente:" : "🩺 Médico:"}{" "}
-						<strong>{user.email}</strong>
+						<strong>{user?.nombre}</strong>
 					</span>
 				)}
 			</div>

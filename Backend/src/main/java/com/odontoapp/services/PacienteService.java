@@ -13,6 +13,7 @@ import com.odontoapp.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -26,13 +27,10 @@ public class PacienteService {
     private final PacienteMapper pacienteMapper;
     private final UsuarioMapper usuarioMapper;
 
+    @Transactional
     public PacienteDTO crearPacienteConUsuario(UsuarioRequestDTO createUserDto, PacienteDTO pacienteDto) {
-        // 1. validar existencia
-        if (usuarioRepo.existsByNombreUsuario(createUserDto.getNombre())) {
-            throw new BadRequestException("nombre de usuario ya existe");
-        }
-        if (usuarioRepo.existsByCorreo(createUserDto.getEmail())) {
-            throw new BadRequestException("correo ya registrado");
+        if(usuarioRepo.existsByDocumento(createUserDto.getDocumento())){
+            throw new BadRequestException("cédula ya registrada");
         }
 
         // 2. crear Usuario
@@ -55,7 +53,7 @@ public class PacienteService {
                 .grupoSanguineo(pacienteDto.getGrupoSanguineo())
                 .alergias(pacienteDto.getAlergias())
                 .medicamentoAlergias(pacienteDto.getMedicamentoAlergias())
-                .EPS(pacienteDto.getEPS())
+                .eps(pacienteDto.getEps())
                 .build();
 
         // cuando salve paciente, MapsId hará que id_usuario se ponga igual al id del usuario

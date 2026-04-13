@@ -26,8 +26,8 @@ public class Paciente {
     @Column(name = "medicamento_alergia", columnDefinition = "TEXT")
     private String medicamentoAlergias;
 
-    @Column(name = "EPS")
-    private String EPS;
+    @Column(name = "eps")
+    private String eps;
 
 
 }

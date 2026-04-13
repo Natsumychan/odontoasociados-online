@@ -25,8 +25,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO crearUsuario(UsuarioRequestDTO dto) {
-        if (repository.existsByCorreo(dto.getEmail())) {
-            throw new BadRequestException("El email ya está registrado.");
+        if (repository.existsByDocumento(dto.getDocumento())) {
+            throw new BadRequestException("La cédula ya está registrada.");
         }
 
         Usuario usuario = mapper.toEntity(dto);

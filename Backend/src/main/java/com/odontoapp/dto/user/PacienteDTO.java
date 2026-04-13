@@ -9,5 +9,5 @@ public class PacienteDTO {
     private String grupoSanguineo;
     private String alergias;
     private String medicamentoAlergias;
-    private String EPS;
+    private String eps;
 }

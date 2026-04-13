@@ -5,77 +5,61 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // ahora guardamos datos del usuario
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+	const [user, setUser] = useState(null);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const navigate = useNavigate();
 
+	// 🔐 LOGIN REAL
+	const login = (token, role, nombre) => {
+		localStorage.setItem("token", token);
+		localStorage.setItem("role", role);
+		localStorage.setItem("nombre", nombre);
 
-  // 🔹 Al iniciar sesión
-  const login = (email, password, role) => {
-    setLoading(true);
+		setUser({ role, nombre });
+		setIsAuthenticated(true);
 
-  return new Promise((resolve) => {
-      setTimeout(() => {
-        // Ejemplo simple de validación (puedes reemplazar con API real)
-        if (email && password) {
-          const loggedUser = { email, role };
-          setUser(loggedUser);
-          setIsAuthenticated(true);
-          setLoading(false);
-          resolve(true);
-          navigate(role === "paciente" ? "/panelUsuario" : "/panelPersonal");
-        } else {
-          setIsAuthenticated(false);
-          setUser(null);
-          setLoading(false);
-          resolve(false);
-        }
-      }, 1000);
-    });
-  };
+		// Redirección automática
+		if (role === "paciente") {
+			navigate("/panelUsuario");
+		} else {
+			navigate("/panelPersonal");
+		}
+	};
 
-  // 🔹 Al cerrar sesión
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    sessionStorage.removeItem("user");
-    navigate("/");
-  };
+	// 🚪 LOGOUT
+	const logout = () => {
+		localStorage.removeItem("token");
+		localStorage.removeItem("role");
 
-  // 🔹 Recuperación de contraseña simulada
-  const recoverPassword = async (email) => {
-    return new Promise((resolve, reject) => {
-      setLoading(true);
-      setTimeout(() => {
-        if (email.includes("@")) {
-          setLoading(false);
-          resolve("Se ha enviado un enlace de recuperación a tu correo.");
-        } else {
-          setLoading(false);
-          reject("El correo ingresado no es válido.");
-        }
-      }, 1500);
-    });
-  };
+		setUser(null);
+		setIsAuthenticated(false);
 
-  // 🔹 Restaurar sesión desde sessionStorage al cargar la app
-  useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
-    }
-  }, []);
+		navigate("/");
+	};
 
-  return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated, loading, login, logout, recoverPassword }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+	// 🔄 RESTAURAR SESIÓN
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		const role = localStorage.getItem("role");
+    const nombre = localStorage.getItem("nombre");
+
+		if (token && role) {
+			setUser({ role,nombre });
+			setIsAuthenticated(true);
+		}
+	}, []);
+
+	return (
+		<AuthContext.Provider
+			value={{
+				user,
+				isAuthenticated,
+				login,
+				logout,
+			}}>
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
 export const useAuth = () => useContext(AuthContext);
