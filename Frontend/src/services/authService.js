@@ -1,30 +1,28 @@
-export const loginRequest = async (email, password) => {
-  try {
-    const response = await fetch("http://localhost:8080/api/usuarios");
+export const loginRequest = async (documento, password) => {
+	try {
+    const response = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ documento, password }),
+    });
 
     if (!response.ok) {
-      throw new Error("Error al contactar el backend");
+      const errorText = await response.text();
+      return { success: false, message: errorText };
     }
 
-    const users = await response.json();
-
-    // Buscar el usuario por email
-    const user = users.find((u) => u.email === email);
-
-    if (!user) {
-      return { success: false, message: "Usuario no encontrado" };
-    }
-
-    // ⚠️ Como no hay JWT ni BCrypt funcionando,
-    // asumimos que backend guarda la contraseña en texto plano.
-    // Más adelante se implementará seguridad real.
-    if (password !== "123456") {
-      return { success: false, message: "Contraseña incorrecta" };
-    }
-
-    return { success: true, user };
+    const data = await response.json();
+    console.log("data = ", data)
+    return {
+      success: true,
+      token: data.token,
+      role: data.role,
+      nombre: data.nombre
+    };
 
   } catch (error) {
-    return { success: false, message: error.message };
+    return { success: false, message: "Error de conexión" };
   }
 };

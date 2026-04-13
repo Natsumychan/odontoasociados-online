@@ -10,6 +10,7 @@ public class OdontoAppApplication {
 
 		SpringApplication.run(OdontoAppApplication.class, args);
 		System.out.println("System on!!");
+
 	}
 
 }
