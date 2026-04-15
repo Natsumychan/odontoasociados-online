@@ -23,6 +23,7 @@ const Appointments = () => {
 
         const data = await res.json();
         console.log("Respuesta bruta del backend:", data);
+        console.log("Respuesta bruta del backend:", data[0].tratamientosNombres);
         // Adaptación: backend devuelve fecha/hora separadas
         const mapped = data.map((cita) => ({
           id: cita.id,
@@ -32,7 +33,7 @@ const Appointments = () => {
           date: cita.fecha,
           time: cita.hora,
           idService: cita.tratamientoId,
-          service: cita.tratamientoNombre || `Tratamiento #${cita.tratamientoId}`,
+          service: cita.tratamientosNombres || `Tratamiento #${cita.tratamientoId}`,
         }));
         setAppointments(mapped);
       } catch (err) {
@@ -153,14 +154,14 @@ const Appointments = () => {
             <div className="flex flex-col items-end gap-2 w-full md:w-auto">
               <button
                 onClick={() => openReprogramModal(appt)}
-                className="w-[120px] border border-[#00439C] text-[#00439C] font-medium px-4 py-2 rounded-md hover:bg-[#00439C] hover:text-white transition"
+                className="w-30 border border-[#00439C] text-[#00439C] font-medium px-4 py-2 rounded-md hover:bg-[#00439C] hover:text-white transition"
               >
                 Reprogramar
               </button>
 
               <button
                 onClick={() => openCancelModal(appt)}
-                className="w-[120px] bg-red-600 text-white font-medium px-4 py-2 rounded-md hover:bg-red-700 transition"
+                className="w-30 bg-red-600 text-white font-medium px-4 py-2 rounded-md hover:bg-red-700 transition"
               >
                 Cancelar
               </button>
