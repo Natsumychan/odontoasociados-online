@@ -67,6 +67,7 @@ const Register = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		console.log("enviando datos...");
+		console.log(validateForm)
 		const validationErrors = validateForm();
 		if (Object.keys(validationErrors).length > 0) {
 			setErrors(validationErrors);
@@ -74,7 +75,7 @@ const Register = () => {
 		}
 
 		setErrors({});
-		const alergia = form.alergias ? "tiene alergias" : "ningua";
+		const alergia = form.alergias ? "tiene alergias" : "ninguna";
 
 		// 🔥 JSON correcto para el backend
 		const requestData = {

@@ -33,6 +33,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // ✅ corregido endpoint
                         .requestMatchers("/auth/**").permitAll()     // por si acaso
+                        .requestMatchers("/api/citas/**").permitAll()
+                        .requestMatchers("/api/pacientes/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
