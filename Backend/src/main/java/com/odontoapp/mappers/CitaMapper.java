@@ -63,31 +63,63 @@ public interface CitaMapper {
     @Mapping(target = "odontologoNombre",
             expression = "java(c.getOdontologo().getNombres() + \" \" + c.getOdontologo().getApellidos())")
 
-    // Tratamiento (primer elemento del Set)
-    @Mapping(target = "tratamientoId",
-            expression = "java(getPrimerTratamientoId(c))")
-    @Mapping(target = "tratamientoNombre",
-            expression = "java(getPrimerTratamientoNombre(c))")
-
-    // Fecha/hora
+    // Fecha y hora
     @Mapping(target = "fecha", expression = "java(c.getFecha().toString())")
     @Mapping(target = "hora", expression = "java(c.getHora().toString())")
 
     // Comentario
     @Mapping(target = "comentario", source = "motivo")
+
+    // 🔥 Tratamientos (LISTAS)
+    @Mapping(target = "tratamientosIds",
+            expression = "java(c.getTratamientos().stream().map(t -> t.getIdTratamiento()).toList())")
+
+    @Mapping(target = "tratamientosNombres",
+            expression = "java(c.getTratamientos().stream().map(t -> t.getNombre()).toList())")
+
     CitaDTO toDto(Cita c);
-
-    // -------- Helpers usados por MapStruct --------
-
-    default Integer getPrimerTratamientoId(Cita c) {
-        if (c.getTratamientos() == null || c.getTratamientos().isEmpty()) return null;
-        Tratamiento t = c.getTratamientos().iterator().next();
-        return t.getIdTratamiento();
-    }
-
-    default String getPrimerTratamientoNombre(Cita c) {
-        if (c.getTratamientos() == null || c.getTratamientos().isEmpty()) return null;
-        Tratamiento t = c.getTratamientos().iterator().next();
-        return t.getNombre();
-    }
 }
+
+//@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+//public interface CitaMapper {
+//
+//    @Mapping(target = "id", source = "idCita")
+//
+//    // Paciente
+//    @Mapping(target = "pacienteId", source = "paciente.idUsuario")
+//    @Mapping(target = "pacienteNombre",
+//            expression = "java(c.getPaciente().getNombres() + \" \" + c.getPaciente().getApellidos())")
+//
+//    // Odontólogo
+//    @Mapping(target = "odontologoId", source = "odontologo.idUsuario")
+//    @Mapping(target = "odontologoNombre",
+//            expression = "java(c.getOdontologo().getNombres() + \" \" + c.getOdontologo().getApellidos())")
+//
+//    // Tratamiento (primer elemento del Set)
+//    @Mapping(target = "tratamientoId",
+//            expression = "java(getPrimerTratamientoId(c))")
+//    @Mapping(target = "tratamientoNombre",
+//            expression = "java(getPrimerTratamientoNombre(c))")
+//
+//    // Fecha/hora
+//    @Mapping(target = "fecha", expression = "java(c.getFecha().toString())")
+//    @Mapping(target = "hora", expression = "java(c.getHora().toString())")
+//
+//    // Comentario
+//    @Mapping(target = "comentario", source = "motivo")
+//    CitaDTO toDto(Cita c);
+//
+//    // -------- Helpers usados por MapStruct --------
+//
+//    default Integer getPrimerTratamientoId(Cita c) {
+//        if (c.getTratamientos() == null || c.getTratamientos().isEmpty()) return null;
+//        Tratamiento t = c.getTratamientos().iterator().next();
+//        return t.getIdTratamiento();
+//    }
+//
+//    default String getPrimerTratamientoNombre(Cita c) {
+//        if (c.getTratamientos() == null || c.getTratamientos().isEmpty()) return null;
+//        Tratamiento t = c.getTratamientos().iterator().next();
+//        return t.getNombre();
+//    }
+//}

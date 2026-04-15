@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -24,4 +25,8 @@ public class CitaDTO {
 
     private String estado;
     private String comentario;
+
+    // 🔥 múltiples tratamientos
+    private List<Integer> tratamientosIds;
+    private List<String> tratamientosNombres;
 }

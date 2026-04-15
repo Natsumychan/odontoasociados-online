@@ -22,4 +22,7 @@ public class Tratamiento {
 
     @Column(nullable = false)
     private Double costo;
+
+    @Column(name = "duracion_minutos", nullable = false)
+    private Integer duracionMinutos;
 }

@@ -2,11 +2,14 @@ package com.odontoapp.controllers;
 
 import com.odontoapp.dto.data.CitaDTO;
 import com.odontoapp.dto.data.CreateCitaRequest;
+import com.odontoapp.dto.user.OdontologoDTO;
 import com.odontoapp.services.CitaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -42,6 +45,28 @@ public class CitaController {
     @GetMapping("/odontologo/{odontologoId}")
     public ResponseEntity<List<CitaDTO>> listarPorOdontologo(@PathVariable Integer medicoId) {
         return ResponseEntity.ok(citaService.listarPorOdontologo(medicoId));
+    }
+
+    @GetMapping("/odontologos/disponibles/{tratamientoId}")
+    public ResponseEntity<List<OdontologoDTO>> obtenerOdontologosDisponibles(
+            @PathVariable Integer tratamientoId) {
+
+        return ResponseEntity.ok(
+                citaService.obtenerOdontologosDisponibles(tratamientoId)
+        );
+    }
+
+    @GetMapping("/disponibles")
+    public ResponseEntity<List<LocalTime>> obtenerHorariosDisponibles(
+            @RequestParam Integer odontologoId,
+            @RequestParam String fecha
+    ) {
+        List<LocalTime> horarios = citaService.obtenerHorariosDisponibles(
+                odontologoId,
+                LocalDate.parse(fecha)
+        );
+
+        return ResponseEntity.ok(horarios);
     }
 
     @PutMapping("/{id}")

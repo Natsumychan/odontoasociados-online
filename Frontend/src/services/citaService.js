@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import api from "./axios";
 
 export async function crearCita(data) {
   const response = await api.post("/citas", data);
@@ -25,6 +25,11 @@ export async function listarCitasPorOdontologo(idOdontologo) {
   return response.data;
 }
 
+export async function cargarOdontologos(tratamientoId) {
+  const response = await api.get(`/citas/odontologos/disponibles/${tratamientoId}`);
+  return response.data;
+}
+
 export async function reprogramarCita(id, data) {
   const response = await api.put(`/citas/${id}`, data);
   return response.data;
@@ -32,5 +37,12 @@ export async function reprogramarCita(id, data) {
 
 export async function cancelarCita(id) {
   const response = await api.post(`/citas/${id}/cancel`);
+  return response.data;
+}
+
+export async function obtenerHorarios(odontologoId, fecha) {
+  const response = await api.get("/citas/disponibles", {
+    params: { odontologoId, fecha }
+  });
   return response.data;
 }
