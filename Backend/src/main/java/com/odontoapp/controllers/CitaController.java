@@ -5,6 +5,7 @@ import com.odontoapp.dto.data.CreateCitaRequest;
 import com.odontoapp.dto.user.OdontologoDTO;
 import com.odontoapp.services.CitaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,16 +58,31 @@ public class CitaController {
     }
 
     @GetMapping("/disponibles")
-    public ResponseEntity<List<LocalTime>> obtenerHorariosDisponibles(
+    public ResponseEntity<List<String>> obtenerHorariosDisponibles(
             @RequestParam Integer odontologoId,
-            @RequestParam String fecha
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam List<Integer> tratamientosIds
     ) {
+
         List<LocalTime> horarios = citaService.obtenerHorariosDisponibles(
                 odontologoId,
-                LocalDate.parse(fecha)
+                fecha,
+                tratamientosIds
         );
 
-        return ResponseEntity.ok(horarios);
+        List<String> response = horarios.stream()
+                .map(h -> h.toString().substring(0, 5)) // HH:mm
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/agenda-dia")
+    public List<CitaDTO> agendaDia(
+            @RequestParam Integer odontologoId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha
+    ) {
+        return citaService.obtenerAgendaDia(odontologoId, fecha);
     }
 
     @PutMapping("/{id}")

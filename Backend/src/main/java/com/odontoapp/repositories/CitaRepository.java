@@ -17,6 +17,11 @@ public interface CitaRepository extends JpaRepository<Cita, Integer> {
 
     List<Cita> findByFecha(LocalDate fecha);
 
+    List<Cita> findByPacienteIdUsuarioAndEstadoOrderByFechaAscHoraAsc(
+            Integer pacienteId,
+            String estado
+    );
+
     // Opcional: buscar citas de un paciente en rango de fechas, etc.
     List<Cita> findByPacienteIdUsuarioAndFechaBetween(Integer pacienteId, LocalDate desde, LocalDate hasta);
 

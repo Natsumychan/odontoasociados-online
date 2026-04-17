@@ -44,7 +44,8 @@ public class AuthController {
         return new LoginResponse(
                 token,
                 user.getRol().name(),
-                user.getNombres()
+                user.getNombres(),
+                user.getIdUsuario()
         );
 
     }

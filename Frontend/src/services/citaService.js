@@ -46,3 +46,33 @@ export async function obtenerHorarios(odontologoId, fecha) {
   });
   return response.data;
 }
+
+export async function obtenerAgendaDia(odontologoId, fecha) {
+  const res = await api.get("/citas/agenda-dia", {
+    params: { odontologoId, fecha }
+  });
+  return res.data;
+}
+
+export const obtenerHorariosDisponibles = async (
+	odontologoId,
+	fecha,
+	tratamientosIds
+) => {
+	const params = new URLSearchParams();
+
+	params.append("odontologoId", odontologoId);
+	params.append("fecha", fecha);
+
+	tratamientosIds.forEach((id) =>
+		params.append("tratamientosIds", id)
+	);
+
+	const res = await fetch(
+		`http://localhost:8080/api/citas/disponibles?${params.toString()}`
+	);
+
+	if (!res.ok) throw new Error("Error obteniendo horarios");
+
+	return await res.json();
+};

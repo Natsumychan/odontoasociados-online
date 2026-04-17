@@ -31,7 +31,7 @@ const LoginSection = () => {
 		}
 
 		// Guardar usuario en AuthContext
-		login(result.token, result.role, result.nombre);
+		login(result.token, result.role, result.nombre, result.idUsuario);
 		console.log(result);
 
 		setLoginSuccess("Ingreso exitoso. ¡Bienvenido!");
