@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { crearCita, cargarOdontologos, obtenerHorarios } from "../services/citaService";
+import {
+	crearCita,
+	cargarOdontologos,
+	obtenerHorarios,
+	obtenerHorariosDisponibles,
+} from "../services/citaService";
+import { AppointmentDay } from "../components";
 
 const NewAppointment = () => {
 	const [odontologos, setOdontologos] = useState([]);
@@ -12,6 +18,27 @@ const NewAppointment = () => {
 		hora: "",
 		motivo: "",
 	});
+	const FESTIVOS = [
+		"2026-01-01", // Año nuevo
+		"2026-01-12", // Reyes Magos (trasladado)
+		"2026-03-23", // San José
+		"2026-04-02", // Jueves Santo
+		"2026-04-03", // Viernes Santo
+		"2026-05-01", // Día del trabajo
+		"2026-05-18", // Ascensión
+		"2026-06-08", // Corpus Christi
+		"2026-06-15", // Sagrado Corazón
+		"2026-07-20", // Independencia
+		"2026-08-07", // Batalla de Boyacá
+		"2026-08-17", // Asunción
+		"2026-10-12", // Día de la raza
+		"2026-11-02", // Día de Todos los santos
+		"2026-11-16", // Independencia Cartagena
+		"2026-12-08", // Inmaculada Concepción
+		"2026-12-25", // Navidad
+		"2027-01-01", // Año nuevo
+		"2027-01-02", // Descanso extra
+	];
 
 	const handleChange = async (e) => {
 		const { name, value } = e.target;
@@ -34,29 +61,54 @@ const NewAppointment = () => {
 			return;
 		}
 
-		if (name === "fecha" || name === "idOdontologo") {
+		if (name === "fecha") {
+			const fechaSeleccionada = new Date(value);
+			const dia = fechaSeleccionada.getDay();
 
-  const newForm = {
-    ...formData,
-    [name]: value
-  };
+			 // 🚫 Domingo
+			if (dia === 6) {
+				alert("No prestamos servicio los domingos");
+				return;
+			}
+		}
 
-  setFormData(newForm);
-
-  if (newForm.fecha && newForm.idOdontologo) {
-    try {
-      const horas = await obtenerHorarios(
-        newForm.idOdontologo,
-        newForm.fecha
-      );
-      setHorarios(horas);
-    } catch (err) {
-      console.error("Error cargando horarios", err);
-    }
+		  // 🚫 Festivos
+  if (FESTIVOS.includes(value)) {
+    alert("Lo sentimos, no prestamos servicio en días festivos");
+    return;
   }
 
-  return;
-	}
+		if (name === "fecha" || name === "idOdontologo") {
+			const newForm = {
+				...formData,
+				[name]: value,
+			};
+
+			setFormData(newForm);
+
+			if (newForm.fecha && newForm.idOdontologo) {
+				try {
+					const horas = await obtenerHorariosDisponibles(
+						newForm.idOdontologo,
+						newForm.fecha,
+						newForm.tratamientosIds,
+					);
+					setHorarios(horas);
+				} catch (err) {
+					console.error("Error cargando horarios", err);
+
+					const mensaje =
+						err.response?.data ||
+						"No hay disponibilidad para la fecha seleccionada";
+
+					alert(mensaje);
+
+					setHorarios([]); // limpiar horarios
+				}
+			}
+
+			return;
+		}
 
 		// ✅ IMPORTANTE: manejar los demás campos
 		setFormData((prev) => ({
@@ -121,11 +173,12 @@ const NewAppointment = () => {
 						</div>
 
 						{/* Odontólogo */}
-						<div disabled={!formData.tratamientosIds.length}>
+						<div>
 							<label className='block text-gray-900 font-bold mb-2'>
 								Odontólogo
 							</label>
 							<select
+								disabled={!formData.tratamientosIds.length}
 								name='idOdontologo'
 								value={formData.idOdontologo ?? ""}
 								onChange={handleChange}
@@ -154,22 +207,39 @@ const NewAppointment = () => {
 								className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500'
 							/>
 						</div>
+						<div>
+							<label className='block text-gray-900 font-bold mb-2'>
+								Horario Disponible
+							</label>
+							<AppointmentDay
+								odontologoId={formData.idOdontologo}
+								fecha={formData.fecha}
+								onSeleccionarHora={(hora) =>
+									setFormData((prev) => ({ ...prev, hora }))
+								}
+							/>
+						</div>
 
 						{/* Hora */}
-						<select
-							name='hora'
-							value={formData.hora}
-							onChange={handleChange}
-							className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500'>
-							<option value=''>Seleccione hora</option>
-							{horarios.map((h, i) => (
-								<option
-									key={i}
-									value={h}>
-									{h}
-								</option>
-							))}
-						</select>
+						<div>
+							<label className='block text-gray-900 font-bold mb-2'>
+								Seleccione la hora para su cita
+							</label>
+							<select
+								name='hora'
+								value={formData.hora}
+								onChange={handleChange}
+								className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500'>
+								<option value=''>Seleccione hora</option>
+								{horarios.map((h, i) => (
+									<option
+										key={i}
+										value={h}>
+										{h}
+									</option>
+								))}
+							</select>
+						</div>
 
 						{/* Motivo */}
 						<div>

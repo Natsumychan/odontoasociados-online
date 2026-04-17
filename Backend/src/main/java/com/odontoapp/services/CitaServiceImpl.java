@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,7 +169,13 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public List<CitaDTO> listarPorPaciente(Integer pacienteId) {
-        return citaRepository.findByPacienteIdUsuario(pacienteId).stream()
+        List<Cita> citas = citaRepository
+                .findByPacienteIdUsuarioAndEstadoOrderByFechaAscHoraAsc(
+                        pacienteId,
+                        "pendiente"
+                );
+
+        return citas.stream()
                 .map(citaMapper::toDto)
                 .toList();
     }
@@ -198,24 +201,63 @@ public class CitaServiceImpl implements CitaService {
             throw new BadRequestException("No se puede reprogramar una cita realizada o cancelada");
         }
 
-        cita.setFecha(request.getFecha());
-        cita.setHora(request.getHora());
-        cita.setMotivo(request.getMotivo()); // ✅ CORREGIDO
+        // 🔥 USAR TRATAMIENTOS EXISTENTES
+        Set<Tratamiento> tratamientos = cita.getTratamientos();
 
+        int duracionTotal = calcularDuracionTotal(tratamientos);
 
-        // 🔥 ACTUALIZAR TRATAMIENTOS
-        if (request.getTratamientosIds() != null && !request.getTratamientosIds().isEmpty()) {
+        LocalTime horaInicio = request.getHora();
+        LocalTime horaFin = horaInicio.plusMinutes(duracionTotal);
 
-            Set<Tratamiento> tratamientos = new HashSet<>(
-                    tratamientoRepository.findAllById(request.getTratamientosIds())
-            );
+        // 🔥 VALIDAR ODONTÓLOGO
+        List<Cita> citasOdontologo = citaRepository
+                .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
+                        request.getIdOdontologo(),
+                        request.getFecha(),
+                        "cancelada"
+                );
 
-            cita.setTratamientos(tratamientos);
+        for (Cita c : citasOdontologo) {
+
+            if (c.getIdCita().equals(cita.getIdCita())) continue;
+
+            int duracionExistente = calcularDuracionTotal(c.getTratamientos());
+
+            LocalTime inicioExistente = c.getHora();
+            LocalTime finExistente = inicioExistente.plusMinutes(duracionExistente);
+
+            if (hayTraslape(horaInicio, horaFin, inicioExistente, finExistente)) {
+                throw new BadRequestException("El odontólogo ya tiene una cita en ese horario");
+            }
         }
 
-        Cita saved = citaRepository.save(cita);
+        // 🔥 VALIDAR PACIENTE
+        List<Cita> citasPaciente = citaRepository
+                .findByPacienteIdUsuarioAndFechaAndEstadoNot(
+                        request.getIdPaciente(),
+                        request.getFecha(),
+                        "cancelada"
+                );
 
-        return citaMapper.toDto(saved);
+        for (Cita c : citasPaciente) {
+
+            if (c.getIdCita().equals(cita.getIdCita())) continue;
+
+            int duracionExistente = calcularDuracionTotal(c.getTratamientos());
+
+            LocalTime inicioExistente = c.getHora();
+            LocalTime finExistente = inicioExistente.plusMinutes(duracionExistente);
+
+            if (hayTraslape(horaInicio, horaFin, inicioExistente, finExistente)) {
+                throw new BadRequestException("El paciente ya tiene una cita en ese horario");
+            }
+        }
+
+        // 🔥 ACTUALIZAR
+        cita.setFecha(request.getFecha());
+        cita.setHora(request.getHora());
+
+        return citaMapper.toDto(citaRepository.save(cita));
     }
 
     @Override
@@ -267,28 +309,86 @@ public class CitaServiceImpl implements CitaService {
     }
 
     @Override
-    public List<LocalTime> obtenerHorariosDisponibles(Integer odontologoId, LocalDate fecha) {
+    public List<LocalTime> obtenerHorariosDisponibles(Integer odontologoId,
+                                                      LocalDate fecha,
+                                                      List<Integer> tratamientosIds) {
 
+        // 🔥 1. BLOQUEAR DOMINGOS
+        if (fecha.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            return Collections.emptyList();
+        }
+
+        // 🔥 2. BLOQUEAR FESTIVOS
+        if (esFestivo(fecha)) {
+            return Collections.emptyList();
+        }
+
+        // 🔥 3. CALCULAR DURACIÓN
+        List<Tratamiento> tratamientos = tratamientoRepository.findAllById(tratamientosIds);
+
+        int duracionTotal = tratamientos.stream()
+                .mapToInt(Tratamiento::getDuracionMinutos)
+                .sum();
+
+        // 🔥 4. TRAER CITAS EXISTENTES
         List<Cita> citas = citaRepository
-                .findByOdontologoIdUsuarioAndFecha(odontologoId, fecha);
-
-        Set<LocalTime> horasOcupadas = citas.stream()
-                .map(Cita::getHora)
-                .collect(Collectors.toSet());
+                .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
+                        odontologoId,
+                        fecha,
+                        "cancelada"
+                );
 
         List<LocalTime> disponibles = new ArrayList<>();
 
         LocalTime inicio = LocalTime.of(8, 0);
         LocalTime fin = LocalTime.of(18, 0);
 
-        while (inicio.isBefore(fin)) {
-            if (!horasOcupadas.contains(inicio)) {
-                disponibles.add(inicio);
+        while (inicio.plusMinutes(duracionTotal).isBefore(fin) ||
+                inicio.plusMinutes(duracionTotal).equals(fin)) {
+
+            LocalTime horaInicio = inicio;
+            LocalTime horaFin = inicio.plusMinutes(duracionTotal);
+
+            // 🔥 BLOQUEAR ALMUERZO (12:00 - 13:00)
+            if (hayTraslape(horaInicio, horaFin,
+                    LocalTime.of(12, 0),
+                    LocalTime.of(13, 0))) {
+
+                inicio = inicio.plusMinutes(30);
+                continue;
             }
-            inicio = inicio.plusMinutes(30); // 🔥 intervalos de 30 min
+
+            boolean ocupado = false;
+
+            for (Cita c : citas) {
+
+                int duracionExistente = calcularDuracionTotal(c.getTratamientos());
+
+                LocalTime inicioExistente = c.getHora();
+                LocalTime finExistente = inicioExistente.plusMinutes(duracionExistente);
+
+                if (hayTraslape(horaInicio, horaFin, inicioExistente, finExistente)) {
+                    ocupado = true;
+                    break;
+                }
+            }
+
+            if (!ocupado) {
+                disponibles.add(horaInicio);
+            }
+
+            inicio = inicio.plusMinutes(30);
         }
 
         return disponibles;
+    }
+
+    public List<CitaDTO> obtenerAgendaDia(Integer odontologoId, LocalDate fecha) {
+        return citaRepository
+                .findByOdontologoIdUsuarioAndFecha(odontologoId, fecha)
+                .stream()
+                .map(citaMapper::toDto)
+                .toList();
     }
 
     // ---------- Helpers ----------
@@ -341,5 +441,40 @@ public class CitaServiceImpl implements CitaService {
                 .numeroLicencia(o.getNumeroLicencia())
                 .trayectoriaProfesional(o.getTrayectoriaProfesional())
                 .build();
+    }
+
+    private boolean hayTraslape(LocalTime inicio1, LocalTime fin1,
+                                LocalTime inicio2, LocalTime fin2) {
+        return inicio1.isBefore(fin2) && fin1.isAfter(inicio2);
+    }
+
+    private int calcularDuracionTotal(Set<Tratamiento> tratamientos) {
+        return tratamientos.stream()
+                .mapToInt(Tratamiento::getDuracionMinutos)
+                .sum();
+    }
+
+    private boolean esFestivo(LocalDate fecha) {
+
+        List<LocalDate> festivos = List.of(
+                LocalDate.of(2026, 1, 1),  // Año nuevo
+                LocalDate.of(2026, 5, 1),  // Día del trabajo
+                LocalDate.of(2026, 5, 18), // Ascensión de Jesús
+                LocalDate.of(2026, 6, 8),  // Corpus Christi
+                LocalDate.of(2026, 6, 15), // Sagrado Corazón de Jesús
+                LocalDate.of(2026, 6, 29), // San Pedro y San Pablo
+                LocalDate.of(2026, 7, 20), // Independencia
+                LocalDate.of(2026, 8, 7),  // Batalla de Boyacá
+                LocalDate.of(2026, 8, 17), // Asunción de la virgen
+                LocalDate.of(2026, 10, 12), // Día de la raza
+                LocalDate.of(2026, 11, 2),  // Todos los Santos
+                LocalDate.of(2026, 11, 16), // Independencia de Cartagena
+                LocalDate.of(2026, 12, 8),  //Inmaculada concepción
+                LocalDate.of(2026, 12, 25), //Navidad
+                LocalDate.of(2027, 1, 1), //Año nuevo 2027
+                LocalDate.of(2027, 1, 2) //Día libre
+        );
+
+        return festivos.contains(fecha);
     }
 }
