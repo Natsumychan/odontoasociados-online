@@ -10,3 +10,4 @@ export { default as Sidebar } from "./Sidebar";
 export { default as ScrollToTop } from "./ScrollToTop";
 export { default as PageTransition } from "./PageTransition";
 export { default as ScrollToLogin } from "./ScrollToLogin";
+export { default as AppointmentDay } from "./AppointmentDay";

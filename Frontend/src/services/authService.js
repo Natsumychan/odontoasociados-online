@@ -19,7 +19,8 @@ export const loginRequest = async (documento, password) => {
       success: true,
       token: data.token,
       role: data.role,
-      nombre: data.nombre
+      nombre: data.nombre,
+      idUsuario: data.idUsuario
     };
 
   } catch (error) {

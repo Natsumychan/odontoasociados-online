@@ -10,12 +10,13 @@ export const AuthProvider = ({ children }) => {
 	const navigate = useNavigate();
 
 	// 🔐 LOGIN REAL
-	const login = (token, role, nombre) => {
+	const login = (token, role, nombre, idUsuario) => {
 		localStorage.setItem("token", token);
 		localStorage.setItem("role", role);
 		localStorage.setItem("nombre", nombre);
+		localStorage.setItem("idUsuario", idUsuario);
 
-		setUser({ role, nombre });
+		setUser({ role, nombre, idUsuario });
 		setIsAuthenticated(true);
 
 		// Redirección automática
