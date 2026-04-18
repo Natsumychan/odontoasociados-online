@@ -261,7 +261,7 @@ const Register = () => {
 							checked={form.alergias}
 							onChange={handleChange}
 						/>
-						<label>¿Alergia?</label>
+						<label>¿Alergias a medicamentos?</label>
 					</div>
 
 					{/* Medicamento */}
