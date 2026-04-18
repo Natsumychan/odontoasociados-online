@@ -1,7 +1,6 @@
 package com.odontoapp.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -12,4 +11,18 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Administrador {
+    @Id
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario")
+    @MapsId
+    private Usuario usuario;
+
+    @Column(name = "area_cargo")
+    private String areaCargo;
+
+    @Column(name = "nivel_acceso")
+    private Integer nivelAcceso;
 }

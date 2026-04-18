@@ -31,8 +31,8 @@ public class OdontologoController {
      * POST /api/medicos
      */
     @PostMapping
-    public ResponseEntity<OdontologoDTO> crearConUsuario(@RequestBody CreateOdontologoWithUserRequest request) {
-        OdontologoDTO created = odontologoService.crearOdontologoConUsuario(request);
+    public ResponseEntity<OdontologoDTO> crearConUsuario(@RequestBody CreateOdontologoRequest request) {
+        OdontologoDTO created = odontologoService.crearOdontologoConUsuario(request.getUsuario(), request.getOdontologo());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

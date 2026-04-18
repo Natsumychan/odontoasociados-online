@@ -26,6 +26,7 @@ public interface UsuarioMapper {
             @Mapping(source = "idUsuario", target = "id"),
             @Mapping(source = "nombres", target = "nombre"),
             @Mapping(source = "apellidos", target = "apellido"),
+            @Mapping(source = "documento", target = "documento"),
             @Mapping(source = "correo", target = "email"),
             @Mapping(source = "telefono", target = "telefono"),
             @Mapping(source = "rol", target = "rol")

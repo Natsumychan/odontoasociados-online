@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import api from "./axios";
 
 export async function crearUsuario(data) {
   const response = await api.post("/usuarios", data);

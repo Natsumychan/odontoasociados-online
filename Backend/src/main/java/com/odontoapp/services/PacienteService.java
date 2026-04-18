@@ -6,6 +6,7 @@ import com.odontoapp.entity.Paciente;
 import com.odontoapp.entity.Rol;
 import com.odontoapp.entity.Usuario;
 import com.odontoapp.exception.BadRequestException;
+import com.odontoapp.exception.ResourceNotFoundException;
 import com.odontoapp.mappers.PacienteMapper;
 import com.odontoapp.mappers.UsuarioMapper;
 import com.odontoapp.repositories.PacienteRepository;
@@ -60,6 +61,20 @@ public class PacienteService {
         Paciente savedPaciente = pacienteRepo.save(paciente);
 
         return pacienteMapper.toDto(savedPaciente);
+    }
+
+    @Transactional
+    public PacienteDTO actualizarPaciente(Integer id, PacienteDTO dto) {
+
+        Paciente paciente = pacienteRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado"));
+
+        paciente.setGrupoSanguineo(dto.getGrupoSanguineo());
+        paciente.setAlergias(dto.getAlergias());
+        paciente.setMedicamentoAlergias(dto.getMedicamentoAlergias());
+        paciente.setEps(dto.getEps());
+
+        return pacienteMapper.toDto(pacienteRepo.save(paciente));
     }
 
     // otros métodos: getById, updatePaciente, deletePaciente...

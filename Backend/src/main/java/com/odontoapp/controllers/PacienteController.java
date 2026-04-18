@@ -23,10 +23,11 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<PacienteDTO> obtener(@PathVariable Integer id) {
-//        return ResponseEntity.ok(pacienteService.obtenerPorId(id));
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<PacienteDTO> actualizar(
+            @PathVariable Integer id,
+            @RequestBody PacienteDTO dto) {
 
-    // listar, actualizar, eliminar...
+        return ResponseEntity.ok(pacienteService.actualizarPaciente(id, dto));
+    }
 }

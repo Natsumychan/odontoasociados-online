@@ -17,7 +17,12 @@ import {
   UserPanel,
   PasswordRecovery,
   ResetPassword,
-  NewAppointment
+  NewAppointment,
+  AdminDashboard,
+  CrearOdontologo,
+  CrearRecepcionista,
+  EditarUsuario,
+  ListarUsuarios
 } from "../pages";
 
 const AnimatedRoutes = () => {
@@ -33,6 +38,7 @@ const AnimatedRoutes = () => {
           <Route path="/iniciar-sesion" element={<PageTransition><ScrollToLogin /></PageTransition>} />
           <Route path="/recuperar-clave" element={<PageTransition><PasswordRecovery /></PageTransition>} />
           <Route path="/restablecer-clave" element={<PageTransition><ResetPassword /></PageTransition>} />
+          <Route path="/panelAdmin" element={<PageTransition><AdminDashboard /></PageTransition>} />
         </Route>
 
         {/* 🔒 RUTAS PROTEGIDAS */}

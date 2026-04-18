@@ -12,6 +12,7 @@ public class UsuarioResponseDTO {
     private Integer id;
     private String nombre;
     private String apellido;
+    private String documento;
     private String email;
     private String telefono;
     private String rol;

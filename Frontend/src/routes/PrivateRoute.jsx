@@ -16,7 +16,8 @@ const PrivateRoute = ({ children, role }) => {
   if (role && user?.role !== role) {
     return (
       <Navigate
-        to={user.role === "paciente" ? "/panelUsuario" : "/dashboardMedico"}
+        to={user.role === "paciente" ? "/panelUsuario" : "/dashboardEquipoDeTrabajo"}
+        to={user.role === "administrador" ? "/adminDashboard" : "/"}
         replace
       />
     );
