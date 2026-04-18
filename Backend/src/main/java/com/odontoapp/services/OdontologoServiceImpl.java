@@ -4,6 +4,7 @@ import com.odontoapp.dto.user.*;
 import com.odontoapp.entity.Rol;
 import com.odontoapp.exception.BadRequestException;
 import com.odontoapp.exception.ResourceNotFoundException;
+import com.odontoapp.dto.user.UsuarioRequestDTO;
 import com.odontoapp.entity.Odontologo;
 import com.odontoapp.entity.Usuario;
 import com.odontoapp.mappers.OdontologoMapper;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -28,27 +30,29 @@ public class OdontologoServiceImpl implements OdontologoService {
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
+
+
     @Transactional
-    public OdontologoDTO crearOdontologoConUsuario(CreateOdontologoWithUserRequest request) {
+    public OdontologoDTO crearOdontologoConUsuario(UsuarioRequestDTO createUserDto, OdontologoDTO odontologoDto) {
 
-        UsuarioRequestDTO usuarioDto = request.getUsuario();
-        OdontologoDTO odontologoDto = request.getOdontologo();
-
-        if (usuarioRepository.existsByCorreo(usuarioDto.getEmail())) {
-            throw new BadRequestException("Correo ya registrado");
+        if(usuarioRepository.existsByDocumento(createUserDto.getDocumento())){
+            throw new BadRequestException("cédula ya registrada");
         }
 
-        Usuario usuario = Usuario.builder()
-                .correo(usuarioDto.getEmail())
-                .clave(passwordEncoder.encode(usuarioDto.getPassword()))
-                .nombres(usuarioDto.getNombre())
-                .apellidos(usuarioDto.getApellido())
-                .telefono(usuarioDto.getTelefono())
-                .rol(Rol.valueOf(usuarioDto.getRol()))
-                .build();
 
-        Usuario savedUser = usuarioRepository.save(usuario);
+        // crear Usuario
+        Usuario user = Usuario.builder()
+                .nombreUsuario(createUserDto.getNombre())
+                .clave(passwordEncoder.encode(createUserDto.getPassword()))
+                .rol(Rol.valueOf(createUserDto.getRol()))
+                .nombres(createUserDto.getNombre())
+                .apellidos(createUserDto.getApellido())
+                .documento(createUserDto.getDocumento())
+                .correo(createUserDto.getEmail())
+                .telefono(createUserDto.getTelefono())
+                .fechaRegistro(LocalDate.now())
+                .build();
+        Usuario savedUser = usuarioRepository.save(user);
 
         Odontologo odontologo = Odontologo.builder()
                 .usuario(savedUser)

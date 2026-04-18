@@ -3,11 +3,12 @@ package com.odontoapp.services;
 import com.odontoapp.dto.user.OdontologoDTO;
 import com.odontoapp.dto.user.CreateOdontologoWithUserRequest;
 import com.odontoapp.dto.user.CreateOdontologoLinkUserRequest;
+import com.odontoapp.dto.user.UsuarioRequestDTO;
 
 import java.util.List;
 
 public interface OdontologoService {
-    OdontologoDTO crearOdontologoConUsuario(CreateOdontologoWithUserRequest request);
+    OdontologoDTO crearOdontologoConUsuario(UsuarioRequestDTO createUserDto, OdontologoDTO odontologoDto);
 
     OdontologoDTO crearOdontologoVinculado(CreateOdontologoLinkUserRequest request);
 
