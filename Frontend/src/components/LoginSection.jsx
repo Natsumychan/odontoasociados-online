@@ -39,7 +39,7 @@ const LoginSection = () => {
 		if (tab === "paciente") {
 			navigate("/panelUsuario");
 		} else {
-			navigate("/panelMedico");
+			navigate("/dashboardEquipoDeTrabajo");
 		}
 	};
 
@@ -82,7 +82,7 @@ const LoginSection = () => {
 									: "text-gray-500"
 							}`}
 							onClick={() => setTab("medico")}>
-							Personal médico
+							Equipo de trabajo
 						</button>
 					</div>
 

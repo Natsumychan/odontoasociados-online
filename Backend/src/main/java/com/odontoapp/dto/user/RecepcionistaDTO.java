@@ -7,6 +7,6 @@ import lombok.Data;
 public class RecepcionistaDTO {
     private Integer idUsuario;
     private UsuarioDTO usuario;
-    private Turno turno;
+    private String turno;
     private String oficina;
 }

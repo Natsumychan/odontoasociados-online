@@ -1,6 +1,5 @@
 package com.odontoapp.repositories;
 
-import com.odontoapp.entity.Paciente;
 import com.odontoapp.entity.Recepcionista;
 import org.springframework.data.jpa.repository.JpaRepository;
 

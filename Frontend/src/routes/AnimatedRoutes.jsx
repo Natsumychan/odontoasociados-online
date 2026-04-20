@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { PageTransition, ScrollToLogin } from "../components";
 
 // Layouts o maquetación de las páginas
-import { MainLayout, DashboardLayout } from "../layouts";
+import { MainLayout, DashboardLayout, DashboardLayoutAdmin } from "../layouts";
 
 // Páginas
 import {
@@ -22,7 +22,9 @@ import {
   CrearOdontologo,
   CrearRecepcionista,
   EditarUsuario,
-  ListarUsuarios
+  ListarUsuarios,
+  LoginAdmin,
+  TeamsPanel
 } from "../pages";
 
 const AnimatedRoutes = () => {
@@ -38,9 +40,10 @@ const AnimatedRoutes = () => {
           <Route path="/iniciar-sesion" element={<PageTransition><ScrollToLogin /></PageTransition>} />
           <Route path="/recuperar-clave" element={<PageTransition><PasswordRecovery /></PageTransition>} />
           <Route path="/restablecer-clave" element={<PageTransition><ResetPassword /></PageTransition>} />
-          <Route path="/panelAdmin" element={<PageTransition><AdminDashboard /></PageTransition>} />
         </Route>
-
+        <Route element={<DashboardLayoutAdmin/>}>
+          <Route path="/admin-inicio" element={<PageTransition><LoginAdmin /></PageTransition>} />
+        </Route>
         {/* 🔒 RUTAS PROTEGIDAS */}
         <Route
           element={
@@ -55,6 +58,12 @@ const AnimatedRoutes = () => {
           <Route path="/pagos" element={<PageTransition><Payments /></PageTransition>} />
           <Route path="/perfil" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/nueva-cita" element={<PageTransition><NewAppointment /></PageTransition>} />
+          <Route path="/dashboardEquipoDeTrabajo" element={<PageTransition><TeamsPanel /></PageTransition>} />
+        </Route>
+        <Route element={<PrivateRoute>
+              <DashboardLayoutAdmin/>
+            </PrivateRoute>}>
+          <Route path="/adminDashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />
         </Route>
       </Routes>
     </AnimatePresence>

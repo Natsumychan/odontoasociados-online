@@ -1,8 +1,6 @@
 package com.odontoapp.controllers;
 
-import com.odontoapp.dto.user.AdministradorDTO;
-import com.odontoapp.dto.user.CreateRecepcionistaRequest;
-import com.odontoapp.dto.user.RecepcionistaDTO;
+import com.odontoapp.dto.user.*;
 import com.odontoapp.services.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +14,10 @@ public class AdminController {
 
     private final AdminService adminService;
 
+    @GetMapping("/usuarios-completo/{id}")
+    public ResponseEntity<UsuarioCompletoDTO> obtenerCompleto(@PathVariable Integer id) {
+        return ResponseEntity.ok(adminService.obtenerUsuarioCompleto(id));
+    }
 
     @PostMapping("/recepcionistas")
     public ResponseEntity<Void> crearRecepcionista(@RequestBody CreateRecepcionistaRequest request) {
@@ -37,5 +39,14 @@ public class AdminController {
             @RequestBody AdministradorDTO dto) {
 
         return ResponseEntity.ok(adminService.actualizar(id, dto));
+    }
+
+    @PutMapping("/usuarios-completo/{id}")
+    public ResponseEntity<Void> actualizarCompleto(
+            @PathVariable Integer id,
+            @RequestBody UsuarioCompletoUpdateDTO dto) {
+
+        adminService.actualizarUsuarioCompleto(id, dto);
+        return ResponseEntity.noContent().build();
     }
 }

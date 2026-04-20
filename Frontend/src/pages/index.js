@@ -15,3 +15,5 @@ export { default as CrearOdontologo } from "./admin/CrearOdontologo";
 export { default as CrearRecepcionista } from "./admin/CrearRecepcionista";
 export { default as EditarUsuario } from "./admin/EditarUsuario";
 export {default as ListarUsuarios} from "./admin/ListarUsuarios";
+export {default as LoginAdmin} from "./admin/LoginAdmin";
+export {default as TeamsPanel} from "./staff/TeamsPanel";

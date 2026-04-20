@@ -2,3 +2,4 @@
 
 export {default as MainLayout} from "./MainLayout";
 export {default as DashboardLayout} from "./DashBoardLayout";
+export {default as DashboardLayoutAdmin} from "./DashBoardLayoutAdmin.jsx"
