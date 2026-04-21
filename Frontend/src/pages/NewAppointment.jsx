@@ -6,6 +6,8 @@ import {
 	obtenerHorariosDisponibles,
 } from "../services/citaService";
 import { AppointmentDay } from "../components";
+import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const NewAppointment = () => {
 	const [odontologos, setOdontologos] = useState([]);
@@ -18,6 +20,8 @@ const NewAppointment = () => {
 		hora: "",
 		motivo: "",
 	});
+	const { user } = useAuth();
+	const pacienteId = user.idUsuario;
 	const FESTIVOS = [
 		"2026-01-01", // Año nuevo
 		"2026-01-12", // Reyes Magos (trasladado)
@@ -39,6 +43,12 @@ const NewAppointment = () => {
 		"2027-01-01", // Año nuevo
 		"2027-01-02", // Descanso extra
 	];
+	const [loading, setLoading] = useState(false);
+	const formularioValido =
+		formData.idOdontologo &&
+		formData.tratamientosIds.length > 0 &&
+		formData.fecha &&
+		formData.hora;
 
 	const handleChange = async (e) => {
 		const { name, value } = e.target;
@@ -65,23 +75,24 @@ const NewAppointment = () => {
 			const fechaSeleccionada = new Date(value);
 			const dia = fechaSeleccionada.getDay();
 
-			 // 🚫 Domingo
+			// 🚫 Domingo
 			if (dia === 6) {
-				alert("No prestamos servicio los domingos");
+				toast.warning("No prestamos servicio los domingos");
 				return;
 			}
 		}
 
-		  // 🚫 Festivos
-  if (FESTIVOS.includes(value)) {
-    alert("Lo sentimos, no prestamos servicio en días festivos");
-    return;
-  }
+		// 🚫 Festivos
+		if (FESTIVOS.includes(value)) {
+			toast.warning("Lo sentimos, no prestamos servicio en días festivos");
+			return;
+		}
 
 		if (name === "fecha" || name === "idOdontologo") {
 			const newForm = {
 				...formData,
 				[name]: value,
+				hora: "",
 			};
 
 			setFormData(newForm);
@@ -90,6 +101,7 @@ const NewAppointment = () => {
 				try {
 					const horas = await obtenerHorariosDisponibles(
 						newForm.idOdontologo,
+						pacienteId,
 						newForm.fecha,
 						newForm.tratamientosIds,
 					);
@@ -101,7 +113,7 @@ const NewAppointment = () => {
 						err.response?.data ||
 						"No hay disponibilidad para la fecha seleccionada";
 
-					alert(mensaje);
+					toast.error(mensaje);
 
 					setHorarios([]); // limpiar horarios
 				}
@@ -119,13 +131,16 @@ const NewAppointment = () => {
 
 	// --- Crear cita ---
 	const handleConfirmar = async () => {
+		if (loading) return; // evita doble click
 		try {
 			console.log("📤 Enviando:", formData);
 			console.log("crearCita:", crearCita);
 			const data = await crearCita(formData); // 🔥 USA AXIOS
 
 			console.log("✅ Cita creada:", data);
-			alert("Cita creada correctamente");
+			toast.success("Cita creada correctamente");
+			// 🔥 Opcional: scroll arriba
+			window.scrollTo({ top: 0, behavior: "smooth" });
 
 			// Reset
 			setFormData({
@@ -139,7 +154,9 @@ const NewAppointment = () => {
 		} catch (error) {
 			console.error("❌ Error backend:", error.response?.data || error.message);
 
-			alert(error.response?.data || "Error creando la cita");
+			toast.error(error.response?.data || "Error creando la cita");
+		} finally {
+			setLoading(false); //termina loading
 		}
 	};
 
@@ -212,6 +229,7 @@ const NewAppointment = () => {
 								Horario Disponible
 							</label>
 							<AppointmentDay
+								key={`${formData.idOdontologo}-${formData.fecha}`} // 🔥 RESETEA COMPONENTE
 								odontologoId={formData.idOdontologo}
 								fecha={formData.fecha}
 								onSeleccionarHora={(hora) =>
@@ -260,8 +278,22 @@ const NewAppointment = () => {
 						<div className='space-y-3'>
 							<button
 								onClick={handleConfirmar}
-								className='w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition'>
-								Confirmar cita
+								disabled={loading || !formularioValido}
+								className={`w-full font-medium py-3 px-4 rounded-lg transition
+    						${
+									!formData.hora
+										? "bg-gray-400 cursor-not-allowed"
+										: "bg-blue-600 hover:bg-blue-700 text-white"
+								}
+  						`}>
+								{loading ? (
+									<>
+										<span className='animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full'></span>
+										Procesando...
+									</>
+								) : (
+									"Confirmar cita"
+								)}
 							</button>
 						</div>
 					</div>

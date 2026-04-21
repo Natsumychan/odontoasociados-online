@@ -27,6 +27,7 @@ public interface CitaRepository extends JpaRepository<Cita, Integer> {
 
     List<Cita> findByOdontologoIdUsuarioAndFecha(Integer id, LocalDate fecha);
 
+    List<Cita> findByPacienteIdUsuarioAndFecha(Integer id, LocalDate fecha);
     // 🔎 Validar si odontólogo ya tiene cita en ese horario
     boolean existsByOdontologoIdUsuarioAndFechaAndHora(
             Integer odontologoId,
@@ -59,13 +60,13 @@ public interface CitaRepository extends JpaRepository<Cita, Integer> {
     List<Cita> findByOdontologoIdUsuarioAndFechaAndEstadoNot(
             Integer odontologoId,
             LocalDate fecha,
-            String estado
+            List<String> estados
     );
 
     List<Cita> findByPacienteIdUsuarioAndFechaAndEstadoNot(
             Integer pacienteId,
             LocalDate fecha,
-            String estado
+            List<String> estados
     );
 
 }

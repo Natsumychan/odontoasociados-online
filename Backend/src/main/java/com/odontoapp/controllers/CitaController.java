@@ -60,12 +60,14 @@ public class CitaController {
     @GetMapping("/disponibles")
     public ResponseEntity<List<String>> obtenerHorariosDisponibles(
             @RequestParam Integer odontologoId,
+            @RequestParam Integer pacienteId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam List<Integer> tratamientosIds
     ) {
 
         List<LocalTime> horarios = citaService.obtenerHorariosDisponibles(
                 odontologoId,
+                pacienteId,
                 fecha,
                 tratamientosIds
         );
@@ -80,9 +82,10 @@ public class CitaController {
     @GetMapping("/agenda-dia")
     public List<CitaDTO> agendaDia(
             @RequestParam Integer odontologoId,
+            @RequestParam Integer pacienteId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha
     ) {
-        return citaService.obtenerAgendaDia(odontologoId, fecha);
+        return citaService.obtenerAgendaDia(odontologoId, pacienteId, fecha);
     }
 
     @PutMapping("/{id}")

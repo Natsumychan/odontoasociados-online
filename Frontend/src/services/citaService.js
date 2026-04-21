@@ -47,21 +47,23 @@ export async function obtenerHorarios(odontologoId, fecha) {
   return response.data;
 }
 
-export async function obtenerAgendaDia(odontologoId, fecha) {
+export async function obtenerAgendaDia(odontologoId,pacienteId, fecha) {
   const res = await api.get("/citas/agenda-dia", {
-    params: { odontologoId, fecha }
+    params: { odontologoId,pacienteId, fecha }
   });
   return res.data;
 }
 
 export const obtenerHorariosDisponibles = async (
 	odontologoId,
+  pacienteId,
 	fecha,
 	tratamientosIds
 ) => {
 	const params = new URLSearchParams();
 
 	params.append("odontologoId", odontologoId);
+  params.append("pacienteId", pacienteId);
 	params.append("fecha", fecha);
 
 	tratamientosIds.forEach((id) =>

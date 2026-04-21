@@ -22,9 +22,9 @@ public interface CitaService {
 
     List<OdontologoDTO> obtenerOdontologosDisponibles(Integer tratamientoId);
 
-    List<LocalTime> obtenerHorariosDisponibles(Integer odontologoId, LocalDate fecha,  List<Integer> tratamientosIds);
+    List<LocalTime> obtenerHorariosDisponibles(Integer odontologoId, Integer pacienteId, LocalDate fecha,  List<Integer> tratamientosIds);
 
-    List<CitaDTO> obtenerAgendaDia(Integer odontologoId, LocalDate fecha);
+    List<CitaDTO> obtenerAgendaDia(Integer odontologoId, Integer pacienteId, LocalDate fecha);
 
     CitaDTO reprogramarCita(Integer id, CreateCitaRequest request);
 

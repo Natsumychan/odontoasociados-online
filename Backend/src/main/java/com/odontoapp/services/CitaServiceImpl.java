@@ -36,6 +36,7 @@ public class CitaServiceImpl implements CitaService {
 
     private static final LocalTime START_WORK = LocalTime.of(8, 0);
     private static final LocalTime END_WORK = LocalTime.of(18, 0);
+    List<String> estadosActivos = List.of("pendiente", "confirmada");
 
     @Override
     @Transactional
@@ -75,12 +76,12 @@ public class CitaServiceImpl implements CitaService {
         }
 
 
-        // 🔥 VALIDACIÓN POR RANGO (IGNORA CANCELADAS)
+        // 🔥 VALIDACIÓN POR RANGO (IGNORA CANCELADAS y REALIZADAS)
         List<Cita> citas = citaRepository
                 .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
                         request.getIdOdontologo(),
                         request.getFecha(),
-                        "cancelada"
+                        estadosActivos
                 );
 
         int duracionTotal = tratamientos.stream()
@@ -117,7 +118,7 @@ public class CitaServiceImpl implements CitaService {
                 .findByPacienteIdUsuarioAndFechaAndEstadoNot(
                         request.getIdPaciente(),
                         request.getFecha(),
-                        "cancelada"
+                        estadosActivos
                 );
 
         for (Cita c : citasPaciente) {
@@ -214,7 +215,7 @@ public class CitaServiceImpl implements CitaService {
                 .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
                         request.getIdOdontologo(),
                         request.getFecha(),
-                        "cancelada"
+                        estadosActivos
                 );
 
         for (Cita c : citasOdontologo) {
@@ -236,7 +237,7 @@ public class CitaServiceImpl implements CitaService {
                 .findByPacienteIdUsuarioAndFechaAndEstadoNot(
                         request.getIdPaciente(),
                         request.getFecha(),
-                        "cancelada"
+                        estadosActivos
                 );
 
         for (Cita c : citasPaciente) {
@@ -310,6 +311,7 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public List<LocalTime> obtenerHorariosDisponibles(Integer odontologoId,
+                                                      Integer pacienteId,
                                                       LocalDate fecha,
                                                       List<Integer> tratamientosIds) {
 
@@ -331,12 +333,24 @@ public class CitaServiceImpl implements CitaService {
                 .sum();
 
         // 🔥 4. TRAER CITAS EXISTENTES
-        List<Cita> citas = citaRepository
+        List<Cita> citasOdontologo = citaRepository
                 .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
                         odontologoId,
                         fecha,
-                        "cancelada"
+                       estadosActivos
                 );
+
+        List<Cita> citasPaciente = citaRepository
+                .findByPacienteIdUsuarioAndFechaAndEstadoNot(
+                        pacienteId,
+                        fecha,
+                        estadosActivos
+                );
+
+        //  UNIFICAR
+        Set<Cita> citas = new HashSet<>();
+        citas.addAll(citasOdontologo);
+        citas.addAll(citasPaciente);
 
         List<LocalTime> disponibles = new ArrayList<>();
 
@@ -383,15 +397,24 @@ public class CitaServiceImpl implements CitaService {
         return disponibles;
     }
 
-    public List<CitaDTO> obtenerAgendaDia(Integer odontologoId, LocalDate fecha) {
-        return citaRepository
-                .findByOdontologoIdUsuarioAndFecha(odontologoId, fecha)
-                .stream()
+    public List<CitaDTO> obtenerAgendaDia(Integer odontologoId, Integer pacienteId, LocalDate fecha) {
+        List<Cita> citasOdontologo = citaRepository
+                .findByOdontologoIdUsuarioAndFecha(odontologoId, fecha);
+
+        List<Cita> citasPaciente = citaRepository
+                .findByPacienteIdUsuarioAndFecha(pacienteId, fecha);
+
+        Set<Cita> todas = new HashSet<>();
+        todas.addAll(citasOdontologo);
+        todas.addAll(citasPaciente);
+
+        return todas.stream()
                 .map(citaMapper::toDto)
                 .toList();
     }
 
     // ---------- Helpers ----------
+
 
     private void validateRequestDates(LocalDate fecha, LocalTime hora) {
         if (fecha == null || hora == null) {

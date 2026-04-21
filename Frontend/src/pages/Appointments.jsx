@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { obtenerHorariosDisponibles } from "../services/citaService";
+import { toast } from "react-toastify";
 
 const Appointments = () => {
 	const [appointments, setAppointments] = useState([]);
@@ -10,6 +11,7 @@ const Appointments = () => {
 	const [newDate, setNewDate] = useState("");
 	const [newTime, setNewTime] = useState("");
 	const [horariosDisponibles, setHorariosDisponibles] = useState([]);
+	const [loading, setLoading] = useState(false);
 
 	const { user } = useAuth();
 	const pacienteId = user.idUsuario; // 🔹 Id el paciente
@@ -18,6 +20,8 @@ const Appointments = () => {
 	useEffect(() => {
 		const fetchAppointments = async () => {
 			try {
+				setLoading(true);
+				toast.info("Cargando citas...");
 				const res = await fetch(
 					`http://localhost:8080/api/citas/paciente/${pacienteId}`,
 				);
@@ -40,10 +44,19 @@ const Appointments = () => {
 						cita.tratamientosNombres || `Tratamiento #${cita.tratamientoId}`,
 				}));
 				setAppointments(mapped);
+				toast.dismiss(); // 🔥 limpia el "cargando"
+
+			if (mapped.length === 0) {
+				toast.info("No tienes citas registradas");
+			} else {
+				toast.success("Citas cargadas correctamente");
+			}
 			} catch (err) {
 				console.error(err);
 				alert("Error cargando citas");
-			}
+			} finally {
+			setLoading(false);
+		}
 		};
 
 		fetchAppointments();
