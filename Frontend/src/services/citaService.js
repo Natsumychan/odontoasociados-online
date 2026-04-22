@@ -1,77 +1,82 @@
 import api from "./axios";
 
 export async function crearCita(data) {
-  const response = await api.post("/citas", data);
-  return response.data;
+	const response = await api.post("/citas", data);
+	return response.data;
 }
 
 export async function obtenerCita(id) {
-  const response = await api.get(`/citas/${id}`);
-  return response.data;
+	const response = await api.get(`/citas/${id}`);
+	return response.data;
 }
 
 export async function listarCitas() {
-  const response = await api.get("/citas");
-  return response.data;
+	const response = await api.get("/citas");
+	return response.data;
 }
 
 export async function listarCitasPorPaciente(idPaciente) {
-  const response = await api.get(`/citas/paciente/${idPaciente}`);
-  return response.data;
+	const response = await api.get(`/citas/paciente/${idPaciente}`);
+	return response.data;
 }
 
 export async function listarCitasPorOdontologo(idOdontologo) {
-  const response = await api.get(`/citas/odontologo/${idOdontologo}`);
-  return response.data;
+	const response = await api.get(`/citas/odontologo/${idOdontologo}`);
+	return response.data;
 }
 
 export async function cargarOdontologos(tratamientoId) {
-  const response = await api.get(`/citas/odontologos/disponibles/${tratamientoId}`);
-  return response.data;
+	const response = await api.get(
+		`/citas/odontologos/disponibles/${tratamientoId}`,
+	);
+	return response.data;
 }
 
 export async function reprogramarCita(id, data) {
-  const response = await api.put(`/citas/${id}`, data);
-  return response.data;
+	const response = await api.put(`/citas/${id}`, data);
+	return response.data;
 }
 
 export async function cancelarCita(id) {
-  const response = await api.post(`/citas/${id}/cancel`);
-  return response.data;
+	const response = await api.post(`/citas/${id}/cancel`);
+	return response.data;
 }
 
 export async function obtenerHorarios(odontologoId, fecha) {
-  const response = await api.get("/citas/disponibles", {
-    params: { odontologoId, fecha }
-  });
-  return response.data;
+	const response = await api.get("/citas/disponibles", {
+		params: { odontologoId, fecha },
+	});
+	return response.data;
 }
 
-export async function obtenerAgendaDia(odontologoId,pacienteId, fecha) {
-  const res = await api.get("/citas/agenda-dia", {
-    params: { odontologoId,pacienteId, fecha }
-  });
-  return res.data;
+export async function obtenerAgendaDia(odontologoId, pacienteId, fecha) {
+	const res = await api.get("/citas/agenda-dia", {
+		params: { odontologoId, pacienteId, fecha },
+	});
+	return res.data;
+}
+
+export async function obtenerAgendaHoy() {
+	const res = await api.get("/citas/agenda/hoy")
+	return res.data;
 }
 
 export const obtenerHorariosDisponibles = async (
 	odontologoId,
-  pacienteId,
+	pacienteId,
 	fecha,
-	tratamientosIds
+	tratamientosIds,
 ) => {
 	const params = new URLSearchParams();
 
 	params.append("odontologoId", odontologoId);
-  params.append("pacienteId", pacienteId);
+	params.append("pacienteId", pacienteId);
 	params.append("fecha", fecha);
 
-	tratamientosIds.forEach((id) =>
-		params.append("tratamientosIds", id)
-	);
+	tratamientosIds.forEach((id) => params.append("tratamientosIds", id));
 
 	const res = await fetch(
-		`http://localhost:8080/api/citas/disponibles?${params.toString()}`
+		`http://localhost:8080/api/citas/disponibles?${params.toString()}`,
 	);
 
 	if (!res.ok) throw new Error("Error obteniendo horarios");

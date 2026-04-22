@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/citas")
@@ -86,6 +87,16 @@ public class CitaController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha
     ) {
         return citaService.obtenerAgendaDia(odontologoId, pacienteId, fecha);
+    }
+
+    @GetMapping("/agenda/hoy")
+    public ResponseEntity<List<CitaDTO>> obtenerAgendaHoy() {
+        return ResponseEntity.ok(citaService.obtenerAgendaHoy());
+    }
+
+    @GetMapping("/dashboard/metrics")
+    public ResponseEntity<Map<String, Long>> obtenerMetricasHoy() {
+        return ResponseEntity.ok(citaService.obtenerMetricasHoy());
     }
 
     @PutMapping("/{id}")

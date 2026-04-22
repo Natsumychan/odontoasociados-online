@@ -57,16 +57,27 @@ public interface CitaRepository extends JpaRepository<Cita, Integer> {
             String estado
     );
 
-    List<Cita> findByOdontologoIdUsuarioAndFechaAndEstadoNot(
+    List<Cita> findByOdontologoIdUsuarioAndFechaAndEstadoIn(
             Integer odontologoId,
             LocalDate fecha,
             List<String> estados
     );
 
-    List<Cita> findByPacienteIdUsuarioAndFechaAndEstadoNot(
+    List<Cita> findByPacienteIdUsuarioAndFechaAndEstadoIn(
             Integer pacienteId,
             LocalDate fecha,
             List<String> estados
     );
+
+    List<Cita> findByFechaAndEstadoInOrderByHoraAsc(
+            LocalDate fecha,
+            List<String> estados
+    );
+
+    long countByFecha(LocalDate fecha);
+
+    long countByFechaAndEstado(LocalDate fecha, String estado);
+
+    long countByFechaAndEstadoIn(LocalDate fecha, List<String> estados);
 
 }

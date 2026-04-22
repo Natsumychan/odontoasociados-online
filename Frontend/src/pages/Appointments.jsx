@@ -46,17 +46,18 @@ const Appointments = () => {
 				setAppointments(mapped);
 				toast.dismiss(); // 🔥 limpia el "cargando"
 
-			if (mapped.length === 0) {
-				toast.info("No tienes citas registradas");
-			} else {
-				toast.success("Citas cargadas correctamente");
-			}
+				if (mapped.length === 0) {
+					toast.info("No tienes citas registradas");
+				} else {
+					toast.success("Citas cargadas correctamente");
+				}
 			} catch (err) {
 				console.error(err);
-				alert("Error cargando citas");
+				toast.dismiss();
+				toast.error("Error cargando citas");
 			} finally {
-			setLoading(false);
-		}
+				setLoading(false);
+			}
 		};
 
 		fetchAppointments();
@@ -69,6 +70,7 @@ const Appointments = () => {
 			try {
 				const horarios = await obtenerHorariosDisponibles(
 					selectedAppointment.idDoctor,
+					pacienteId,
 					newDate,
 					[selectedAppointment.tratamientosIds],
 				);
@@ -92,6 +94,7 @@ const Appointments = () => {
 		try {
 			const horarios = await obtenerHorariosDisponibles(
 				appt.idDoctor,
+				pacienteId,
 				appt.date,
 				[appt.tratamientosIds],
 			);
@@ -108,7 +111,7 @@ const Appointments = () => {
 		console.log("id cita", selectedAppointment.id);
 		console.log("id tratamiento", selectedAppointment.tratamientosIds);
 		if (!newDate || !newTime) {
-			alert("Debe seleccionar fecha y hora válida");
+			toast.warning("Debe seleccionar fecha y hora válida");
 			return;
 		}
 		try {
@@ -137,10 +140,10 @@ const Appointments = () => {
 			);
 
 			setReprogramModalOpen(false);
-			alert("Cita reprogramada con éxito");
+			toast.success("Cita reprogramada con éxito");
 		} catch (err) {
 			console.error(err);
-			alert("No se pudo reprogramar la cita");
+			toast.error("No se pudo reprogramar la cita");
 		}
 	};
 
@@ -165,10 +168,10 @@ const Appointments = () => {
 			);
 
 			setCancelModalOpen(false);
-			alert("Cita cancelada");
+			toast.success("Cita cancelada");
 		} catch (err) {
 			console.error(err);
-			alert("No se pudo cancelar la cita");
+			toast.warning("No se pudo cancelar la cita");
 		}
 	};
 
@@ -178,50 +181,57 @@ const Appointments = () => {
 				Mis citas
 			</h2>
 
-			<div className='space-y-6'>
-				{appointments.length === 0 && (
-					<p className='text-center text-gray-600'>
-						No tienes citas registradas.
-					</p>
-				)}
+			{/*Lista de citas */}
+			{loading ? (
+				<div className='flex justify-center items-center py-10'>
+					<div className='animate-spin h-10 w-10 border-4 border-[#00439C] border-t-transparent rounded-full'></div>
+				</div>
+			) : (
+				<div className='space-y-6'>
+					{appointments.length === 0 && (
+						<p className='text-center text-gray-600'>
+							No tienes citas registradas.
+						</p>
+					)}
 
-				{appointments.map((appt) => (
-					<div
-						key={appt.id}
-						className='bg-white shadow-md rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center transition hover:shadow-lg'>
-						<div className='mb-4 md:mb-0'>
-							<h3 className='text-lg font-semibold text-gray-900 mb-2'>
-								Cita con {appt.doctor}
-							</h3>
-							<p className='text-gray-700'>
-								<strong>Fecha:</strong> {appt.date}
-							</p>
-							<p className='text-gray-700'>
-								<strong>Hora:</strong> {appt.time}
-							</p>
-							<p
-								className='text-gray-700'
-								key={appt.tratamientosIds}>
-								<strong>Servicio:</strong> {appt.service}
-							</p>
+					{appointments.map((appt) => (
+						<div
+							key={appt.id}
+							className='bg-white shadow-md rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center transition hover:shadow-lg'>
+							<div className='mb-4 md:mb-0'>
+								<h3 className='text-lg font-semibold text-gray-900 mb-2'>
+									Cita con {appt.doctor}
+								</h3>
+								<p className='text-gray-700'>
+									<strong>Fecha:</strong> {appt.date}
+								</p>
+								<p className='text-gray-700'>
+									<strong>Hora:</strong> {appt.time}
+								</p>
+								<p
+									className='text-gray-700'
+									key={appt.tratamientosIds}>
+									<strong>Servicio:</strong> {appt.service}
+								</p>
+							</div>
+
+							<div className='flex flex-col items-end gap-2 w-full md:w-auto'>
+								<button
+									onClick={() => openReprogramModal(appt)}
+									className='w-30 border border-[#00439C] text-[#00439C] font-medium px-4 py-2 rounded-md hover:bg-[#00439C] hover:text-white transition'>
+									Reprogramar
+								</button>
+
+								<button
+									onClick={() => openCancelModal(appt)}
+									className='w-30 bg-red-600 text-white font-medium px-4 py-2 rounded-md hover:bg-red-700 transition'>
+									Cancelar
+								</button>
+							</div>
 						</div>
-
-						<div className='flex flex-col items-end gap-2 w-full md:w-auto'>
-							<button
-								onClick={() => openReprogramModal(appt)}
-								className='w-30 border border-[#00439C] text-[#00439C] font-medium px-4 py-2 rounded-md hover:bg-[#00439C] hover:text-white transition'>
-								Reprogramar
-							</button>
-
-							<button
-								onClick={() => openCancelModal(appt)}
-								className='w-30 bg-red-600 text-white font-medium px-4 py-2 rounded-md hover:bg-red-700 transition'>
-								Cancelar
-							</button>
-						</div>
-					</div>
-				))}
-			</div>
+					))}
+				</div>
+			)}
 
 			{/* Modal de reprogramar */}
 			{isReprogramModalOpen && (

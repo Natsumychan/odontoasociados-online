@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { actualizarUsuario } from "../../services/usuarioService";
 import { actualizarOdontologo } from "../../services/odontologoService";
 import { cargarUsuario, actualizarUsuarioCompleto } from "../../services/administradorService";
+import { toast } from "react-toastify";
 // luego agregas los otros services
 
 export default function EditarUsuario({
@@ -96,7 +97,7 @@ export default function EditarUsuario({
 			onClose();
 		} catch (error) {
 			console.error(error);
-			alert("Error al actualizar");
+			toast.error("Error al actualizar");
 		}
 	};
 

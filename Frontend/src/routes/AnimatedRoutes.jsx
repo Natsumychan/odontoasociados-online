@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { PageTransition, ScrollToLogin } from "../components";
 
 // Layouts o maquetación de las páginas
-import { MainLayout, DashboardLayout, DashboardLayoutAdmin } from "../layouts";
+import { MainLayout, DashboardLayout, DashboardLayoutStaff, DashboardLayoutAdmin } from "../layouts";
 
 // Páginas
 import {
@@ -58,9 +58,15 @@ const AnimatedRoutes = () => {
           <Route path="/pagos" element={<PageTransition><Payments /></PageTransition>} />
           <Route path="/perfil" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/nueva-cita" element={<PageTransition><NewAppointment /></PageTransition>} />
+        </Route>
+        <Route element={
+            <PrivateRoute>
+              <DashboardLayoutStaff/>
+            </PrivateRoute>}>
           <Route path="/dashboardEquipoDeTrabajo" element={<PageTransition><TeamsPanel /></PageTransition>} />
         </Route>
-        <Route element={<PrivateRoute>
+        <Route element={
+            <PrivateRoute>
               <DashboardLayoutAdmin/>
             </PrivateRoute>}>
           <Route path="/adminDashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />

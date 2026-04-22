@@ -78,7 +78,7 @@ public class CitaServiceImpl implements CitaService {
 
         // 🔥 VALIDACIÓN POR RANGO (IGNORA CANCELADAS y REALIZADAS)
         List<Cita> citas = citaRepository
-                .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
+                .findByOdontologoIdUsuarioAndFechaAndEstadoIn(
                         request.getIdOdontologo(),
                         request.getFecha(),
                         estadosActivos
@@ -115,7 +115,7 @@ public class CitaServiceImpl implements CitaService {
         }
 
         List<Cita> citasPaciente = citaRepository
-                .findByPacienteIdUsuarioAndFechaAndEstadoNot(
+                .findByPacienteIdUsuarioAndFechaAndEstadoIn(
                         request.getIdPaciente(),
                         request.getFecha(),
                         estadosActivos
@@ -169,6 +169,53 @@ public class CitaServiceImpl implements CitaService {
     }
 
     @Override
+    public List<CitaDTO> obtenerAgendaHoy() {
+
+        LocalDate hoy = LocalDate.now();
+
+        List<Cita> citas = citaRepository
+                .findByFechaAndEstadoInOrderByHoraAsc(
+                        hoy,
+                        List.of("pendiente", "confirmada")
+                );
+
+        return citas.stream()
+                .map(citaMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public Map<String, Long> obtenerMetricasHoy() {
+
+        LocalDate hoy = LocalDate.now();
+
+        long total = citaRepository.countByFecha(hoy);
+
+        long pendientes = citaRepository.countByFechaAndEstadoIn(
+                hoy,
+                List.of("pendiente", "confirmada")
+        );
+
+        long realizadas = citaRepository.countByFechaAndEstado(
+                hoy,
+                "realizada"
+        );
+
+        long canceladas = citaRepository.countByFechaAndEstado(
+                hoy,
+                "cancelada"
+        );
+
+        Map<String, Long> metrics = new HashMap<>();
+        metrics.put("total", total);
+        metrics.put("pendientes", pendientes);
+        metrics.put("realizadas", realizadas);
+        metrics.put("canceladas", canceladas);
+
+        return metrics;
+    }
+
+    @Override
     public List<CitaDTO> listarPorPaciente(Integer pacienteId) {
         List<Cita> citas = citaRepository
                 .findByPacienteIdUsuarioAndEstadoOrderByFechaAscHoraAsc(
@@ -212,8 +259,7 @@ public class CitaServiceImpl implements CitaService {
 
         // 🔥 VALIDAR ODONTÓLOGO
         List<Cita> citasOdontologo = citaRepository
-                .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
-                        request.getIdOdontologo(),
+                .findByOdontologoIdUsuarioAndFechaAndEstadoIn(                       request.getIdOdontologo(),
                         request.getFecha(),
                         estadosActivos
                 );
@@ -234,7 +280,7 @@ public class CitaServiceImpl implements CitaService {
 
         // 🔥 VALIDAR PACIENTE
         List<Cita> citasPaciente = citaRepository
-                .findByPacienteIdUsuarioAndFechaAndEstadoNot(
+                .findByPacienteIdUsuarioAndFechaAndEstadoIn(
                         request.getIdPaciente(),
                         request.getFecha(),
                         estadosActivos
@@ -334,14 +380,13 @@ public class CitaServiceImpl implements CitaService {
 
         // 🔥 4. TRAER CITAS EXISTENTES
         List<Cita> citasOdontologo = citaRepository
-                .findByOdontologoIdUsuarioAndFechaAndEstadoNot(
-                        odontologoId,
+                .findByOdontologoIdUsuarioAndFechaAndEstadoIn(                       odontologoId,
                         fecha,
                        estadosActivos
                 );
 
         List<Cita> citasPaciente = citaRepository
-                .findByPacienteIdUsuarioAndFechaAndEstadoNot(
+                .findByPacienteIdUsuarioAndFechaAndEstadoIn(
                         pacienteId,
                         fecha,
                         estadosActivos

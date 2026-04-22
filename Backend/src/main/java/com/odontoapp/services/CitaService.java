@@ -7,6 +7,7 @@ import com.odontoapp.dto.user.OdontologoDTO;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 public interface CitaService {
 
@@ -25,6 +26,10 @@ public interface CitaService {
     List<LocalTime> obtenerHorariosDisponibles(Integer odontologoId, Integer pacienteId, LocalDate fecha,  List<Integer> tratamientosIds);
 
     List<CitaDTO> obtenerAgendaDia(Integer odontologoId, Integer pacienteId, LocalDate fecha);
+
+    List<CitaDTO> obtenerAgendaHoy();
+
+    Map<String, Long> obtenerMetricasHoy();
 
     CitaDTO reprogramarCita(Integer id, CreateCitaRequest request);
 
